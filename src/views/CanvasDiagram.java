@@ -158,6 +158,7 @@ public class CanvasDiagram  extends JPanel{
 	}
 
 	private void fillRectangle(Graphics2D g2, MyRectangle rectangle, MyProcess process) {
+		rectangle.setColorRectangle(process.getColor());
 		g2.setColor(rectangle.getColorRectangle());
 		g2.fill(rectangle);
 		g2.setColor(Color.WHITE);

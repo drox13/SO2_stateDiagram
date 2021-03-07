@@ -157,6 +157,12 @@ public class Manager extends MyThread{
 
 			if (queueWaitingIO.isEmtry()) {
 				process.setState(State.WAITING_I_O);
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return;
 			}
 		}else if (optionNextProcess == 3) {

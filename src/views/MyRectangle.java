@@ -28,5 +28,4 @@ public class MyRectangle extends Rectangle{
 	public void setColorRectangle(Color colorRectangle) {
 		this.colorRectangle = colorRectangle;
 	}
-	
 }

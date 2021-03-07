@@ -165,9 +165,4 @@ public class MyQueue <T> implements Iterable<T>{
 			}
 		};	
 	}
-	
-//	@Override
-//	public String toString() {
-//		return head.infoNode + "";
-//	}
 }
