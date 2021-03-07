@@ -59,19 +59,22 @@ public class Manager extends MyThread{
 			}
 		}
 	}
+	
 	/**
 	 * pone en la cola de ready el proceso
 	 * @param process proceso a encolar
 	 */
 	private void changeStateCreateToQReady() {
 		for (MyProcess myProcess : processList) {
-			myProcess.setState(State.QUEUE_READY);
-			queueWaitingReady.putToQueue(myProcess);
-			printStatusProcess();
-			try {
-				Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if(myProcess.getState().equals(State.CREATE)){
+				myProcess.setState(State.QUEUE_READY);
+				queueWaitingReady.putToQueue(myProcess);
+				printStatusProcess();
+				try {
+					Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -90,7 +93,6 @@ public class Manager extends MyThread{
 				assignState(nextProcess, process);
 			}else {
 				process.setState(State.TERMINATED);
-				processList.remove(process);
 			}
 		}
 	}
@@ -131,7 +133,6 @@ public class Manager extends MyThread{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		changeStateCreateToQReady();
 		start();
 	}
 
@@ -163,6 +164,9 @@ public class Manager extends MyThread{
 	@Override
 	void executeTask() {
 		System.out.println("------------");
+		removeProcessTerminated(fildByState(State.TERMINATED));
+		changeStateCreateToQReady();
+		
 		executing(fildByState(State.EXECUTING));
 		changeStateReadytoExecuting();
 		putInReady();
@@ -173,10 +177,16 @@ public class Manager extends MyThread{
 
 		moveProccesToQueueReady(fildByState(State.WAITING_CPU));
 		putQueueWaitinCPU();
-
+		
 		printStatusProcess();
 		if(processList.size() == 0) {
 			stop();
+		}
+	}
+
+	private void removeProcessTerminated(MyProcess process) {
+		if(process != null) {
+			processList.remove(process);
 		}
 	}
 
@@ -245,14 +255,4 @@ public class Manager extends MyThread{
 	public CopyOnWriteArrayList<MyProcess> getProcessList() {
 		return processList;
 	}
-
-//	public static void main(String[] args) {
-//		Manager m = new Manager();
-//
-//		m.addToList(Manager.createProcess(8));
-//		m.addToList(Manager.createProcess(6));
-//		m.addToList(Manager.createProcess(10));
-//		m.addToList(Manager.createProcess(6));
-//		m.firstExecute();
-//	}
 }

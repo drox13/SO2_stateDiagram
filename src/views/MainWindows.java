@@ -1,6 +1,7 @@
 package views;
 
 import java.awt.BorderLayout;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -38,8 +39,7 @@ public class MainWindows extends JFrame{
 		canvasDiagram.setWaitingIO(queueWaitingIO);
 	}
 	
-	
-	public static void main(String[] args) {
-		new MainWindows();
+	public void updateProcessListGUI(CopyOnWriteArrayList<MyProcess> processList) {
+		canvasDiagram.updateProcessListGUI(processList);
 	}
 }

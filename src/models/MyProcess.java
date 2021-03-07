@@ -35,7 +35,6 @@ public class MyProcess {
 	}
 
 	public String toString() {
-		return "Process [id=" + id + ", name=" + name + 
-				", state=" + state + ", duration=" + duration + "]";
+		return name +  "\n duracion: " + duration;
 	}
 }

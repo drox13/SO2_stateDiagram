@@ -26,34 +26,16 @@ public class Presenter {
 		
 		manager.firstExecute();
 		
-		Timer loop = new Timer(1500, new ActionListener() {
+		Timer loop = new Timer(300, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainWindows.setWaitingReady(manager.getQueueWaitingReady());
 				mainWindows.setWaitingCPU(manager.getQueueWaitingCPU());
 				mainWindows.setWaitingIO(manager.getQueueWaitingIO());
+				mainWindows.updateProcessListGUI(manager.getProcessList());
 			}
 		});
 		loop.start();
-		manager.start();
 		
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingReady(Manager.createProcess(10));
-//		manager.enqueueWaitingCPU(Manager.createProcess(9));
-//		manager.enqueueWaitingCPU(Manager.createProcess(9));
-//		manager.enqueueWaitingCPU(Manager.createProcess(9));
-//		manager.enqueueWaitingCPU(Manager.createProcess(9));
-//		manager.enqueueWaitingIO(Manager.createProcess(8));
-//		manager.enqueueWaitingIO(Manager.createProcess(8));
-//		manager.enqueueWaitingIO(Manager.createProcess(8));
-//		manager.enqueueWaitingIO(Manager.createProcess(8));
-//		mainWindows.setWaitingReady(manager.getQueueWaitingReady());
-//		mainWindows.setWaitingCPU(manager.getQueueWaitingCPU());
-//		mainWindows.setWaitingIO(manager.getQueueWaitingIO());
 	}
 }
