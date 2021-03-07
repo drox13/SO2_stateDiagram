@@ -37,4 +37,9 @@ public class MainWindows extends JFrame{
 	public void setWaitingIO(MyQueue<MyProcess> queueWaitingIO) {
 		canvasDiagram.setWaitingIO(queueWaitingIO);
 	}
+	
+	
+	public static void main(String[] args) {
+		new MainWindows();
+	}
 }
