@@ -19,10 +19,21 @@ public class Presenter {
 	}
 	
 	public void init() {
-		manager.addToList(Manager.createProcess(8));
-		manager.addToList(Manager.createProcess(6));
-		manager.addToList(Manager.createProcess(10));
-		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(8));
+//		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(10));
+//		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(8));
+//		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(10));
+//		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(8));
+//		manager.addToList(Manager.createProcess(6));
+//		manager.addToList(Manager.createProcess(10));
+//		manager.addToList(Manager.createProcess(6));
+		for (int i = 0; i < 20; i++) {
+			manager.addToList(Manager.createProcess(manager.generateRandomNumberEven()));
+		}
 		
 		manager.firstExecute();
 		

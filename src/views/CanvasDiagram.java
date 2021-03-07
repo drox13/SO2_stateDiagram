@@ -16,6 +16,7 @@ import structure.MyQueue;
 
 public class CanvasDiagram  extends JPanel{
 
+	private static final int SIZE_OVAL = 20;
 	private static final String RED_LIGHT = "#FF5733";
 	private static final String GREEN = "#3ADF00";
 	private static final String GREEN_LIGHT = "#00FFBF";
@@ -67,6 +68,7 @@ public class CanvasDiagram  extends JPanel{
 		paintState(g2, waitingIO, "WAITING I/O");
 		paintState(g2, receivingIO, "RECEIVED I/O");
 		paintState(g2, terminated, "TERMINATED");
+		paintArrow(g2);
 		paintQueueReady(g2);
 		paintQueueCPU(g2);
 		paintQueueIO(g2);
@@ -82,6 +84,39 @@ public class CanvasDiagram  extends JPanel{
 				(int) (rectangle.getY() + rectangle.getHeight() + 20));
 	}
 	
+	private void paintArrow(Graphics2D g2) {
+		g2.drawLine(create.x + MyRectangle.WIDTH_RECTANGLE_STATE, create.y, 
+				ready.x, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
+		g2.fillOval(ready.x - 13, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE, SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(ready.x + MyRectangle.WIDTH_RECTANGLE_STATE, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
+				executing.x, executing.y);
+		g2.fillOval(executing.x - 15, executing.y - 15, SIZE_OVAL, SIZE_OVAL);
+		g2.fillOval(ready.x + MyRectangle.WIDTH_RECTANGLE_STATE, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE - 10,
+				SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(executing.x + MyRectangle.WIDTH_RECTANGLE_STATE, executing.y,
+				waitingCpu.x + MyRectangle.WIDTH_RECTANGLE_STATE,
+				waitingCpu.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
+		g2.fillOval(waitingCpu.x + MyRectangle.WIDTH_RECTANGLE_STATE - 6,
+				waitingCpu.y + MyRectangle.HEIGTH_RECTANGLE_STATE, SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(executing.x + MyRectangle.WIDTH_RECTANGLE_STATE, executing.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
+				terminated.x, terminated.y);
+		g2.fillOval(terminated.x - 10, terminated.y - 10, SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(executing.x, executing.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
+				waitingIO.x + (MyRectangle.WIDTH_RECTANGLE_STATE / 2), waitingIO.y);
+		g2.fillOval(waitingIO.x + (MyRectangle.WIDTH_RECTANGLE_STATE / 2) - 10, waitingIO.y - 15, SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(waitingIO.x, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2),
+				receivingIO.x + MyRectangle.WIDTH_RECTANGLE_STATE, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2));
+		g2.fillOval(receivingIO.x + MyRectangle.WIDTH_RECTANGLE_STATE, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2) - 10, SIZE_OVAL, SIZE_OVAL);
+		
+		g2.drawLine(receivingIO.x, receivingIO.y,
+				ready.x, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
+	}
+	
 	private void paintProccess(Graphics2D g2) {
 	if(processListGUI != null) {
 			for (MyProcess process : processListGUI) {
@@ -90,8 +125,8 @@ public class CanvasDiagram  extends JPanel{
 					g2.setColor(create.getColorRectangle());
 					g2.fill(create);
 					g2.setColor(Color.WHITE);
-					g2.drawString("# procesos: " + processListGUI.size(), (int)(create.getX() +create.getWidth()/3),
-							(int) (create.getY() + create.getHeight()/2));
+					g2.drawString("# procesos: " + processListGUI.size(), (int)(create.getX() + 30),
+							(int) (create.getY() + create.getHeight()/2) + 10);
 					break;
 				case READY:
 					fillRectangle(g2, ready, process);
@@ -126,20 +161,21 @@ public class CanvasDiagram  extends JPanel{
 		g2.setColor(rectangle.getColorRectangle());
 		g2.fill(rectangle);
 		g2.setColor(Color.WHITE);
-		g2.drawString(process.getName(), (int)(rectangle.getX() +rectangle.getWidth()/3),
-				(int) (rectangle.getY() + rectangle.getHeight()/2));
+		g2.drawString(process.toString(), (int)(rectangle.getX() + 30),
+				(int) (rectangle.getY() + rectangle.getHeight()/2 + 10));
 	}
 	
 	private void paintQueueReady(Graphics2D g2) {
-		int posY = 10;
+		int posY = 40;
+		g2.drawString("Queue Ready", 25, 20);
 		if(waitingReadyGUI != null) {
 			Iterator<MyProcess> iterator = waitingReadyGUI.iterator();
 			while (iterator.hasNext()) {
-				MyRectangle processInQueue = new MyRectangle(ready.x - 200, posY);
+				MyRectangle processInQueue = new MyRectangle(20, posY);
 				g2.setColor(processInQueue.getColorRectangle());
 				g2.draw(processInQueue);
 				posY += 50;
-				g2.drawString(iterator.toString(), ready.x - 200, posY - 30);
+				g2.drawString(iterator.toString(), 25, posY - 20);
 				iterator.next();
 			}
 		}
@@ -154,6 +190,7 @@ public class CanvasDiagram  extends JPanel{
 				g2.setColor(processInQueue.getColorRectangle());
 				g2.draw(processInQueue);
 				posY += 50;
+				g2.drawString(iterator.toString(), waitingCpu.x + 225, posY - 20);
 				iterator.next();
 			}
 		}
@@ -168,6 +205,7 @@ public class CanvasDiagram  extends JPanel{
 				g2.setColor(processInQueue.getColorRectangle());
 				g2.draw(processInQueue);
 				posY += 50;
+				g2.drawString(iterator.toString(), waitingIO.x + 225, posY - 20);
 				iterator.next();
 			}
 		}

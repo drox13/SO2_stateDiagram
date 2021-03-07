@@ -72,16 +72,17 @@ public class Manager extends MyThread{
 	 * @param process proceso a encolar
 	 */
 	private void changeStateCreateToQReady() {
+		try {
+			Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		for (MyProcess myProcess : processList) {
 			if(myProcess.getState().equals(State.CREATE)){
 				myProcess.setState(State.QUEUE_READY);
 				queueWaitingReady.putToQueue(myProcess);
 				printStatusProcess();
-				try {
-					Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	}
@@ -98,8 +99,29 @@ public class Manager extends MyThread{
 			if (process.getDuration() != 0) {
 				nextProcess = generateRandom();
 				assignState(nextProcess, process);
+				validateQueueReadyIsEmpty();
 			}else {
 				process.setState(State.TERMINATED);
+			}
+		}
+	}
+
+	private void validateQueueReadyIsEmpty() {
+		if (queueWaitingReady.isEmtry()) {
+			MyProcess processInReceivingIOAux = fildByState(State.RECEIVING_I_O);
+			MyProcess processInWaitingCPUAux = fildByState(State.QUEUE_WAITING_CPU);
+			if (processInReceivingIOAux != null && processInWaitingCPUAux.equals(null)) {
+				processInReceivingIOAux.setState(State.EXECUTING);
+			}else if (processInWaitingCPUAux != null && processInReceivingIOAux.equals(null)) {
+				processInWaitingCPUAux.setState(State.EXECUTING);
+			}else if (processInReceivingIOAux != null && processInWaitingCPUAux != null) {
+				if (faceOrSeal()) {
+					processInReceivingIOAux.setState(State.EXECUTING);
+				}else {
+					processInWaitingCPUAux.setState(State.EXECUTING);
+				}
+			}else if (processInReceivingIOAux.equals(null) && processInWaitingCPUAux.equals(null)) {
+				System.out.println("fsdfs");
 			}
 		}
 	}
@@ -118,13 +140,26 @@ public class Manager extends MyThread{
 	 */
 	private void assignState(int optionNextProcess, MyProcess process) {
 		if (optionNextProcess == 1) {
-			process.setState(State.QUEUE_WAITING_CPU);
-			queueWaitingCPU.putToQueue(process);
+			if (fildByState(State.WAITING_CPU) != null) {
+				process.setState(State.QUEUE_WAITING_CPU);
+				queueWaitingCPU.putToQueue(process);
+			}
+
+			if (queueWaitingCPU.isEmtry()) {
+				process.setState(State.WAITING_CPU);
+				return;
+			}
 		}else if (optionNextProcess == 2) {
-			process.setState(State.QUEUE_WAITING_I_O);
-			queueWaitingIO.putToQueue(process);
-		}
-		else if (optionNextProcess == 3) {
+			if (fildByState(State.WAITING_I_O) != null) {
+				process.setState(State.QUEUE_WAITING_I_O);
+				queueWaitingIO.putToQueue(process);
+			}
+
+			if (queueWaitingIO.isEmtry()) {
+				process.setState(State.WAITING_I_O);
+				return;
+			}
+		}else if (optionNextProcess == 3) {
 			process.setState(State.QUEUE_READY);
 			queueWaitingReady.putToQueue(process);
 		}
@@ -179,11 +214,16 @@ public class Manager extends MyThread{
 		putInReady();
 
 		moveProccesToQueueReady(fildByState(State.RECEIVING_I_O));
-		changeWaitingIOtoReceivingIO(fildByState(State.WAITING_I_O));
-		putQueueWaitingIO();
 
-		moveProccesToQueueReady(fildByState(State.WAITING_CPU));
-		putQueueWaitinCPU();
+		if (faceOrSeal()) {
+			changeWaitingIOtoReceivingIO(fildByState(State.WAITING_I_O));
+			putQueueWaitingIO();
+		}
+
+		if (faceOrSeal()) {
+			moveProccesToQueueReady(fildByState(State.WAITING_CPU));
+			putQueueWaitingCPU();
+		}
 
 		printStatusProcess();
 		if(processList.size() == 0) {
@@ -210,7 +250,7 @@ public class Manager extends MyThread{
 	/**
 	 * saca el proceso de la COLA del WAITING CPU y lo para al ESTADO WAITING CPU
 	 */
-	private void putQueueWaitinCPU() {
+	private void putQueueWaitingCPU() {
 		try {
 			queueWaitingCPU.getToQueue().setState(State.WAITING_CPU);;
 		} catch (Exception e) {
@@ -276,7 +316,7 @@ public class Manager extends MyThread{
 	}
 	/**
 	 * genera una opcion random para toma de desiciones
-	 * @return true or false
+	 * @return true or false --> cara : receivedIO || cruz : waitingCPU
 	 */
 	public boolean faceOrSeal() {
 		Random random = new Random();

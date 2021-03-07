@@ -9,7 +9,7 @@ public class MyProcess {
 	
 	public MyProcess(int duration) {
 		id = count++;
-		name = "Process " + id;
+		name = "P" + id;
 		this.state = State.CREATE;
 		this.duration = duration;
 	}
@@ -35,6 +35,6 @@ public class MyProcess {
 	}
 
 	public String toString() {
-		return name +  "\n duracion: " + duration;
+		return name +  " | duracion: " + duration;
 	}
 }
