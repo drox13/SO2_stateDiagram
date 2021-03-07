@@ -10,6 +10,13 @@ public class Manager extends MyThread{
 	private static final int MIN_NUMBER = 1;
 	private static final int MAX_NUMBER = 4;
 	private static final long LIMIT_NUMBER = 1;
+
+	private static final int MIN_NUMBER_EVEN = 8;
+	private static final int MAX_NUMBER_EVEN = 21;
+	private static final long LIMIT_NUMBER_EVEN = 1;
+	private static final int MIN_NUM = 0;
+	private static final int MAX_NUM = 2;
+	private static final long LIMIT = 1;
 	private MyQueue<MyProcess> queueWaitingReady;
 	private MyQueue<MyProcess> queueWaitingCPU;
 	private MyQueue<MyProcess> queueWaitingIO;
@@ -59,7 +66,7 @@ public class Manager extends MyThread{
 			}
 		}
 	}
-	
+
 	/**
 	 * pone en la cola de ready el proceso
 	 * @param process proceso a encolar
@@ -166,7 +173,7 @@ public class Manager extends MyThread{
 		System.out.println("------------");
 		removeProcessTerminated(fildByState(State.TERMINATED));
 		changeStateCreateToQReady();
-		
+
 		executing(fildByState(State.EXECUTING));
 		changeStateReadytoExecuting();
 		putInReady();
@@ -177,7 +184,7 @@ public class Manager extends MyThread{
 
 		moveProccesToQueueReady(fildByState(State.WAITING_CPU));
 		putQueueWaitinCPU();
-		
+
 		printStatusProcess();
 		if(processList.size() == 0) {
 			stop();
@@ -255,4 +262,38 @@ public class Manager extends MyThread{
 	public CopyOnWriteArrayList<MyProcess> getProcessList() {
 		return processList;
 	}
+	/**
+	 * Genera un numero aleatorio par
+	 * @return el numero generado
+	 */
+	public int generateRandomNumberEven() {
+		Random random = new Random();
+		int number = random.ints(MIN_NUMBER_EVEN, MAX_NUMBER_EVEN).limit(LIMIT_NUMBER_EVEN).findFirst().getAsInt();
+		while(number % 2 != 0) {
+			number = random.ints(MIN_NUMBER_EVEN, MAX_NUMBER_EVEN).limit(LIMIT_NUMBER_EVEN).findFirst().getAsInt();
+		}
+		return number;
+	}
+	/**
+	 * genera una opcion random para toma de desiciones
+	 * @return true or false
+	 */
+	public boolean faceOrSeal() {
+		Random random = new Random();
+		int countFace = 0;
+		int countCross = 0;
+		int number = 0;
+		for (int i = 0; i < 7; i++) {
+			number = random.ints(MIN_NUM, MAX_NUM).limit(LIMIT).findFirst().getAsInt();
+			System.out.println(number);
+			if (number == 0) {
+				countFace += 1;
+			}else {
+				countCross += 1;
+			}
+		}
+		return countFace > countCross;
+	}
+
+
 }
