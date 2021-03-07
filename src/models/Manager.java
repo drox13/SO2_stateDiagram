@@ -18,7 +18,7 @@ public class Manager extends MyThread{
 	private boolean isReady;
 
 	public Manager() {
-		super(1000);
+		super(2000);
 		queueWaitingReady = new MyQueue<MyProcess>();
 		queueWaitingCPU = new MyQueue<MyProcess>();
 		queueWaitingIO = new MyQueue<MyProcess>();
@@ -71,7 +71,6 @@ public class Manager extends MyThread{
 			try {
 				Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -133,7 +132,6 @@ public class Manager extends MyThread{
 			e.printStackTrace();
 		}
 		changeStateCreateToQReady();
-
 		start();
 	}
 
@@ -232,7 +230,6 @@ public class Manager extends MyThread{
 		}
 	}
 
-
 	public MyQueue<MyProcess> getQueueWaitingReady() {
 		return queueWaitingReady;
 	}
@@ -249,13 +246,13 @@ public class Manager extends MyThread{
 		return processList;
 	}
 
-	public static void main(String[] args) {
-		Manager m = new Manager();
-
-		m.addToList(Manager.createProcess(8));
-		m.addToList(Manager.createProcess(6));
-		m.addToList(Manager.createProcess(10));
-		m.addToList(Manager.createProcess(6));
-		m.firstExecute();
-	}
+//	public static void main(String[] args) {
+//		Manager m = new Manager();
+//
+//		m.addToList(Manager.createProcess(8));
+//		m.addToList(Manager.createProcess(6));
+//		m.addToList(Manager.createProcess(10));
+//		m.addToList(Manager.createProcess(6));
+//		m.firstExecute();
+//	}
 }

@@ -15,14 +15,17 @@ public class Presenter {
 	public Presenter() {
 		manager = new Manager();
 		mainWindows = new MainWindows();
-		initi();
+		init();
 	}
 	
-	public void initi() {
+	public void init() {
 		manager.addToList(Manager.createProcess(8));
 		manager.addToList(Manager.createProcess(6));
 		manager.addToList(Manager.createProcess(10));
 		manager.addToList(Manager.createProcess(6));
+		
+		manager.firstExecute();
+		
 		Timer loop = new Timer(1500, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

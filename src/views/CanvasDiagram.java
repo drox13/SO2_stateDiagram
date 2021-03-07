@@ -79,37 +79,44 @@ public class CanvasDiagram  extends JPanel{
 	
 	private void paintQueueReady(Graphics2D g2) {
 		int posY = 10;
-		Iterator<MyProcess> iterator = waitingReadyGUI.iterator();
-		while (iterator.hasNext()) {
-			MyRectangle processInQueue = new MyRectangle(ready.x - 200, posY);
-			g2.setColor(processInQueue.getColorRectangle());
-			g2.draw(processInQueue);
-			posY += 50;
-			iterator.next();
+		if(waitingReadyGUI != null) {
+			Iterator<MyProcess> iterator = waitingReadyGUI.iterator();
+			while (iterator.hasNext()) {
+				MyRectangle processInQueue = new MyRectangle(ready.x - 200, posY);
+				g2.setColor(processInQueue.getColorRectangle());
+				g2.draw(processInQueue);
+				posY += 50;
+				iterator.next();
+			}
 		}
+		
 	}
 	
 	private void paintQueueCPU(Graphics2D g2) {
 		int posY = 10;
-		Iterator<MyProcess> iterator = waitingCPU_GUI.iterator();
-		while (iterator.hasNext()) {
-			MyRectangle processInQueue = new MyRectangle(waitingCpu.x + 220, posY);
-			g2.setColor(processInQueue.getColorRectangle());
-			g2.draw(processInQueue);
-			posY += 50;
-			iterator.next();
+		if(waitingCPU_GUI != null) {
+			Iterator<MyProcess> iterator = waitingCPU_GUI.iterator();
+			while (iterator.hasNext()) {
+				MyRectangle processInQueue = new MyRectangle(waitingCpu.x + 220, posY);
+				g2.setColor(processInQueue.getColorRectangle());
+				g2.draw(processInQueue);
+				posY += 50;
+				iterator.next();
+			}
 		}
 	}
 	
 	private void paintQueueIO(Graphics2D g2) {
 		int posY = waitingIO.y;
-		Iterator<MyProcess> iterator = waitingIO_GUI.iterator();
-		while (iterator.hasNext()) {
-			MyRectangle processInQueue = new MyRectangle(waitingIO.x + 220, posY);
-			g2.setColor(processInQueue.getColorRectangle());
-			g2.draw(processInQueue);
-			posY += 50;
-			iterator.next();
+		if(waitingIO_GUI != null) {
+			Iterator<MyProcess> iterator = waitingIO_GUI.iterator();
+			while (iterator.hasNext()) {
+				MyRectangle processInQueue = new MyRectangle(waitingIO.x + 220, posY);
+				g2.setColor(processInQueue.getColorRectangle());
+				g2.draw(processInQueue);
+				posY += 50;
+				iterator.next();
+			}
 		}
 	}
 	
