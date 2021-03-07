@@ -18,7 +18,7 @@ public class Manager extends MyThread{
 	private boolean isReady;
 
 	public Manager() {
-		super(2000);
+		super(1000);
 		queueWaitingReady = new MyQueue<MyProcess>();
 		queueWaitingCPU = new MyQueue<MyProcess>();
 		queueWaitingIO = new MyQueue<MyProcess>();
@@ -45,62 +45,18 @@ public class Manager extends MyThread{
 		processList.add(process);
 	}
 
-	public void updateState(MyProcess process) {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		switch (State.valueOf(process.getState().toString())) {
-		case CREATE:
-			break;
-		case QUEUE_READY:
-			putInReady();
-			break;
-		case EXECUTING:
-			executing(fildByState(State.EXECUTING));
-			break;
-		case QUEUE_WAITING_CPU:
-			process.setState(State.WAITING_CPU);
-			queueWaitingCPU.getToQueue();
-			break;
-		case QUEUE_WAITING_I_O:
-			process.setState(State.WAITING_I_O);
-			queueWaitingIO.getToQueue();
-			break;
-		case READY:
-			break;
-		case RECEIVING_I_O:
-			break;
-		case TERMINATED:
-			System.out.println("Proceso " + process.getName() + " terminado");
-			processList.remove(process);
-			if (getProcessList().size() == 0) {
-				stop();
-				System.out.println("Simulacion terminada!");
-			}
-			break;
-		case WAITING_CPU:
-			break;
-		case WAITING_I_O:
-			process.setState(State.RECEIVING_I_O);
-			break;
-		default:
-			break;
-		}
-	}
-
-
-
 	/**
 	 * saca de la cola el proceso correspondiente
 	 * lo coloca en estado READY
 	 */
 	private void putInReady() {
 		if(!isReady) {
-			queueWaitingReady.getToQueue().setState(State.READY);
-			isReady = true;
+			try {
+				queueWaitingReady.getToQueue().setState(State.READY);
+				isReady = true;
+			} catch (Exception e) {
+				System.out.println("line 106 cola Ready vacia");
+			}
 		}
 	}
 	/**
@@ -111,6 +67,7 @@ public class Manager extends MyThread{
 		for (MyProcess myProcess : processList) {
 			myProcess.setState(State.QUEUE_READY);
 			queueWaitingReady.putToQueue(myProcess);
+			printStatusProcess();
 			try {
 				Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 			} catch (InterruptedException e) {
@@ -134,6 +91,7 @@ public class Manager extends MyThread{
 				assignState(nextProcess, process);
 			}else {
 				process.setState(State.TERMINATED);
+				processList.remove(process);
 			}
 		}
 	}
@@ -157,29 +115,25 @@ public class Manager extends MyThread{
 		}else if (optionNextProcess == 2) {
 			process.setState(State.QUEUE_WAITING_I_O);
 			queueWaitingIO.putToQueue(process);
-		}else if (optionNextProcess == 3) {
+		}
+		else if (optionNextProcess == 3) {
 			process.setState(State.QUEUE_READY);
 			queueWaitingReady.putToQueue(process);
 		}
 	}
-
-
 
 	/**
 	 * Permite que los procesos cambien de estado Create a la cola de ready como primer paso
 	 */
 	public void firstExecute () {
 		printStatusProcess(); //simulcion
-
 		try {
 			Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		changeStateCreateToQReady();
-		printStatusProcess();
-		//		putInReady();
-		//		printStatusProcess();
+
 		start();
 	}
 
@@ -214,10 +168,62 @@ public class Manager extends MyThread{
 		executing(fildByState(State.EXECUTING));
 		changeStateReadytoExecuting();
 		putInReady();
+
+		moveProccesToQueueReady(fildByState(State.RECEIVING_I_O));
+		changeWaitingIOtoReceivingIO(fildByState(State.WAITING_I_O));
+		putQueueWaitingIO();
+
+		moveProccesToQueueReady(fildByState(State.WAITING_CPU));
+		putQueueWaitinCPU();
+
 		printStatusProcess();
+		if(processList.size() == 0) {
+			stop();
+		}
+	}
+
+	/**
+	 * mueve el proceso hacia la cola del READY
+	 * @param process
+	 */
+	private void moveProccesToQueueReady(MyProcess process) {
+		if(process != null) {
+			process.setState(State.QUEUE_READY);
+			queueWaitingReady.putToQueue(process);
+		}
 	}
 	/**
-	 * cambia el estado del proceso que este en REaADY a EXECUTING
+	 * saca el proceso de la COLA del WAITING CPU y lo para al ESTADO WAITING CPU
+	 */
+	private void putQueueWaitinCPU() {
+		try {
+			queueWaitingCPU.getToQueue().setState(State.WAITING_CPU);;
+		} catch (Exception e) {
+			System.out.println("line 221  cola CPU vacio");
+		}
+	}
+	/**
+	 * mueve el proceso del WAITING I/O hacia RECEIVING I/O
+	 * @param process
+	 */
+	private void changeWaitingIOtoReceivingIO(MyProcess process) {
+		if(process != null) {
+			process.setState(State.RECEIVING_I_O);
+		}
+	}
+	/**
+	 * Saca de la cola del Waiting IO y lo pasa al ESTADO WAITING IO
+	 */
+	private void putQueueWaitingIO() {
+		try {
+			queueWaitingIO.getToQueue().setState(State.WAITING_I_O);;
+		} catch (Exception e) {
+			System.out.println("line 221  cola I/0 vacio");
+		}
+	}
+
+	/**
+	 * cambia el estado del proceso que este en READY a EXECUTING
 	 */
 	private void changeStateReadytoExecuting() {
 		if(fildByState(State.READY)!= null) {
@@ -251,6 +257,5 @@ public class Manager extends MyThread{
 		m.addToList(Manager.createProcess(10));
 		m.addToList(Manager.createProcess(6));
 		m.firstExecute();
-
 	}
 }
