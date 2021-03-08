@@ -11,6 +11,7 @@ import structure.MyQueue;
  *
  */
 public class Manager extends MyThread{
+	private static final int TIME_INTERVAL_BETWEEN_PROCESSES = 2000;
 	private static final int MIN_NUMBER = 1;
 	private static final int MAX_NUMBER = 4;
 	private static final long LIMIT_NUMBER = 1;
@@ -29,7 +30,7 @@ public class Manager extends MyThread{
 	private boolean isReady;
 
 	public Manager() {
-		super(2000);
+		super(TIME_INTERVAL_BETWEEN_PROCESSES);
 		queueWaitingReady = new MyQueue<MyProcess>();
 		queueWaitingCPU = new MyQueue<MyProcess>();
 		queueWaitingIO = new MyQueue<MyProcess>();
@@ -55,18 +56,15 @@ public class Manager extends MyThread{
 	public void addToList(MyProcess process) {
 		processList.add(process);
 	}
-
+	
 	/**
-	 * saca de la cola el proceso correspondiente
-	 * lo coloca en estado READY
+	 * mueve el proceso hacia la cola del READY
+	 * @param process
 	 */
-	private void putInReady() {
-		if(!isReady) {
-			try {
-				queueWaitingReady.getToQueue().setState(State.READY);
-				isReady = true;
-			} catch (Exception e) {
-			}
+	private void moveProccesToQueueReady(MyProcess process) {
+		if(process != null) {
+			process.setState(State.QUEUE_READY);
+			queueWaitingReady.putToQueue(process);
 		}
 	}
 
@@ -87,6 +85,35 @@ public class Manager extends MyThread{
 				queueWaitingReady.putToQueue(myProcess);
 			}
 		}
+	}
+	
+	/**
+	 * mueve el proceso del WAITING I/O hacia RECEIVING I/O
+	 * @param process
+	 */
+	private void changeWaitingIOtoReceivingIO(MyProcess process) {
+		if(process != null) {
+			process.setState(State.RECEIVING_I_O);
+		}
+	}
+	
+	/**
+	 * cambia el estado del proceso que este en READY a EXECUTING
+	 */
+	private void changeStateReadytoExecuting() {
+		if(findByState(State.READY)!= null) {
+			findByState(State.READY).setState(State.EXECUTING);
+			isReady = false;
+		}
+	}
+	
+	/**
+	 * genera un nuero aleatorio en un intervalo definido
+	 * @return
+	 */
+	private static int generateRandom() {
+		Random random = new Random();
+		return random.ints(MIN_NUMBER, MAX_NUMBER).limit(LIMIT_NUMBER).findFirst().getAsInt();
 	}
 
 	/**
@@ -127,14 +154,7 @@ public class Manager extends MyThread{
 			}
 		}
 	}
-	/**
-	 * genera un nuero aleatorio en un intervalo definido
-	 * @return
-	 */
-	private static int generateRandom() {
-		Random random = new Random();
-		return random.ints(MIN_NUMBER, MAX_NUMBER).limit(LIMIT_NUMBER).findFirst().getAsInt();
-	}
+	
 
 	/**
 	 * Cambia el estado del proceso dependiendo del optionNextProcess
@@ -154,8 +174,8 @@ public class Manager extends MyThread{
 		}
 	}
 	/**
-	 * verifica si existe un estado en Waiting IO
-	 * si existe lo exncola sino lo pone en estado WaitingI/O
+	 * verifica si existe un proceso en Waiting IO
+	 * si existe lo encola sino lo pone en estado WaitingI/O
 	 * @param process proceso a cambiar de estado
 	 */
 	private void checkWaitingIOstatus(MyProcess process) {
@@ -175,7 +195,7 @@ public class Manager extends MyThread{
 		}
 	}
 	/**
-	 * erifica si existe un estado en Waiting CPU
+	 * verifica si existe un estado en Waiting CPU
 	 * si existe lo exncola sino lo pone en estado WaitingCPU
 	 * @param process proceso a cambiar de estado
 	 */
@@ -194,7 +214,7 @@ public class Manager extends MyThread{
 	/**
 	 * ejecuta el hilo para cambiar de estados los procesos
 	 */
-	public void firstExecute () {
+	public void startExecute () {
 		start();
 	}
 
@@ -203,7 +223,7 @@ public class Manager extends MyThread{
 	 * @param state estado del proceso
 	 * @return el estado encontrado o null segun sea el caso
 	 */
-	public MyProcess findByState(State state) {
+	private MyProcess findByState(State state) {
 		for (MyProcess myProcess : processList) {
 			if(myProcess.getState().equals(state)) {
 				return myProcess;
@@ -247,14 +267,18 @@ public class Manager extends MyThread{
 		}
 	}
 
+	
 	/**
-	 * mueve el proceso hacia la cola del READY
-	 * @param process
+	 * saca de la cola el proceso correspondiente
+	 * lo coloca en estado READY
 	 */
-	private void moveProccesToQueueReady(MyProcess process) {
-		if(process != null) {
-			process.setState(State.QUEUE_READY);
-			queueWaitingReady.putToQueue(process);
+	private void putInReady() {
+		if(!isReady) {
+			try {
+				queueWaitingReady.getToQueue().setState(State.READY);
+				isReady = true;
+			} catch (Exception e) {
+			}
 		}
 	}
 	/**
@@ -262,18 +286,10 @@ public class Manager extends MyThread{
 	 */
 	private void putQueueWaitingCPU() {
 		try {
-			queueWaitingCPU.getToQueue().setState(State.WAITING_CPU);;
+			queueWaitingCPU.getToQueue().setState(State.WAITING_CPU);
 		} catch (Exception e) {}
 	}
-	/**
-	 * mueve el proceso del WAITING I/O hacia RECEIVING I/O
-	 * @param process
-	 */
-	private void changeWaitingIOtoReceivingIO(MyProcess process) {
-		if(process != null) {
-			process.setState(State.RECEIVING_I_O);
-		}
-	}
+	
 	/**
 	 * Saca de la cola del Waiting IO y lo pasa al ESTADO WAITING IO
 	 */
@@ -281,16 +297,6 @@ public class Manager extends MyThread{
 		try {
 			queueWaitingIO.getToQueue().setState(State.WAITING_I_O);;
 		} catch (Exception e) {}
-	}
-
-	/**
-	 * cambia el estado del proceso que este en READY a EXECUTING
-	 */
-	private void changeStateReadytoExecuting() {
-		if(findByState(State.READY)!= null) {
-			findByState(State.READY).setState(State.EXECUTING);
-			isReady = false;
-		}
 	}
 
 	public MyQueue<MyProcess> getQueueWaitingReady() {

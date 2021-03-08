@@ -27,7 +27,7 @@ public class Presenter {
 			manager.addToList(Manager.createProcess(manager.generateRandomNumberEven()));
 		}
 		
-		manager.firstExecute();
+		manager.startExecute();
 		
 		Timer loop = new Timer(300, new ActionListener() {
 			@Override

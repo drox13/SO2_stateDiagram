@@ -14,7 +14,10 @@ public class MyProcess {
 	private State state;
 	private int duration;
 	private Color color;
-
+	/**
+	 * constructor
+	 * @param duration duracion del proceso
+	 */
 	public MyProcess(int duration) {
 		id = count++;
 		name = "P" + id;
@@ -22,7 +25,10 @@ public class MyProcess {
 		this.duration = duration;
 		color = generateRamdonColor();
 	}
-
+	/**
+	 * genera un color Ramdon
+	 * @return
+	 */
 	public Color generateRamdonColor() {
 		Random Rand = new Random();
 		float r = Rand.nextFloat();
@@ -31,7 +37,6 @@ public class MyProcess {
 		Color randomColor = new Color(r, g, b);
 		return randomColor;
 	}
-
 
 	public State getState() {
 		return state;
@@ -52,7 +57,7 @@ public class MyProcess {
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
-	
+
 	public Color getColor() {
 		return color;
 	}
