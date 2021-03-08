@@ -1,6 +1,10 @@
 package exception;
 
-
+/**
+ * 
+ * @author Dario Baron
+ *
+ */
 public class MyException extends NullPointerException{
 
 	private static final long serialVersionUID = 1L;

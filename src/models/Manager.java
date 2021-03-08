@@ -5,7 +5,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import structure.MyQueue;
-
+/**
+ * 
+ * @author Dario Baron, Brayan Cardenas
+ *
+ */
 public class Manager extends MyThread{
 	private static final int MIN_NUMBER = 1;
 	private static final int MAX_NUMBER = 4;
@@ -62,7 +66,6 @@ public class Manager extends MyThread{
 				queueWaitingReady.getToQueue().setState(State.READY);
 				isReady = true;
 			} catch (Exception e) {
-				System.out.println("line 106 cola Ready vacia");
 			}
 		}
 	}
@@ -77,12 +80,11 @@ public class Manager extends MyThread{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		for (MyProcess myProcess : processList) {
 			if(myProcess.getState().equals(State.CREATE)){
 				myProcess.setState(State.QUEUE_READY);
 				queueWaitingReady.putToQueue(myProcess);
-				printStatusProcess();
 			}
 		}
 	}
@@ -105,11 +107,13 @@ public class Manager extends MyThread{
 			}
 		}
 	}
-
+	/**
+	 * valida que la cola del READY este vacia y toma acciones dependiendo de esto
+	 */
 	private void validateQueueReadyIsEmpty() {
-		if (queueWaitingReady.isEmtry()) {
-			MyProcess processInReceivingIOAux = fildByState(State.RECEIVING_I_O);
-			MyProcess processInWaitingCPUAux = fildByState(State.QUEUE_WAITING_CPU);
+		if (queueWaitingReady.isEmpty()) {
+			MyProcess processInReceivingIOAux = findByState(State.RECEIVING_I_O);
+			MyProcess processInWaitingCPUAux = findByState(State.QUEUE_WAITING_CPU);
 			if (processInReceivingIOAux != null && processInWaitingCPUAux.equals(null)) {
 				processInReceivingIOAux.setState(State.EXECUTING);
 			}else if (processInWaitingCPUAux != null && processInReceivingIOAux.equals(null)) {
@@ -120,12 +124,13 @@ public class Manager extends MyThread{
 				}else {
 					processInWaitingCPUAux.setState(State.EXECUTING);
 				}
-			}else if (processInReceivingIOAux.equals(null) && processInWaitingCPUAux.equals(null)) {
-				System.out.println("fsdfs");
 			}
 		}
 	}
-
+	/**
+	 * genera un nuero aleatorio en un intervalo definido
+	 * @return
+	 */
 	private static int generateRandom() {
 		Random random = new Random();
 		return random.ints(MIN_NUMBER, MAX_NUMBER).limit(LIMIT_NUMBER).findFirst().getAsInt();
@@ -140,47 +145,56 @@ public class Manager extends MyThread{
 	 */
 	private void assignState(int optionNextProcess, MyProcess process) {
 		if (optionNextProcess == 1) {
-			if (fildByState(State.WAITING_CPU) != null) {
-				process.setState(State.QUEUE_WAITING_CPU);
-				queueWaitingCPU.putToQueue(process);
-			}
-
-			if (queueWaitingCPU.isEmtry()) {
-				process.setState(State.WAITING_CPU);
-				return;
-			}
+			checkWaitingCPUSstatus(process);
 		}else if (optionNextProcess == 2) {
-			if (fildByState(State.WAITING_I_O) != null) {
-				process.setState(State.QUEUE_WAITING_I_O);
-				queueWaitingIO.putToQueue(process);
-			}
-
-			if (queueWaitingIO.isEmtry()) {
-				process.setState(State.WAITING_I_O);
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return;
-			}
+			checkWaitingIOstatus(process);
 		}else if (optionNextProcess == 3) {
 			process.setState(State.QUEUE_READY);
 			queueWaitingReady.putToQueue(process);
 		}
 	}
+	/**
+	 * verifica si existe un estado en Waiting IO
+	 * si existe lo exncola sino lo pone en estado WaitingI/O
+	 * @param process proceso a cambiar de estado
+	 */
+	private void checkWaitingIOstatus(MyProcess process) {
+		if (findByState(State.WAITING_I_O) != null) {
+			process.setState(State.QUEUE_WAITING_I_O);
+			queueWaitingIO.putToQueue(process);
+		}
+
+		if (queueWaitingIO.isEmpty()) {
+			process.setState(State.WAITING_I_O);
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+	}
+	/**
+	 * erifica si existe un estado en Waiting CPU
+	 * si existe lo exncola sino lo pone en estado WaitingCPU
+	 * @param process proceso a cambiar de estado
+	 */
+	private void checkWaitingCPUSstatus(MyProcess process) {
+		if (findByState(State.WAITING_CPU) != null) {
+			process.setState(State.QUEUE_WAITING_CPU);
+			queueWaitingCPU.putToQueue(process);
+		}
+
+		if (queueWaitingCPU.isEmpty()) {
+			process.setState(State.WAITING_CPU);
+			return;
+		}
+	}
 
 	/**
-	 * Permite que los procesos cambien de estado Create a la cola de ready como primer paso
+	 * ejecuta el hilo para cambiar de estados los procesos
 	 */
 	public void firstExecute () {
-		printStatusProcess(); //simulcion
-		try {
-			Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		start();
 	}
 
@@ -189,7 +203,7 @@ public class Manager extends MyThread{
 	 * @param state estado del proceso
 	 * @return el estado encontrado o null segun sea el caso
 	 */
-	public MyProcess fildByState(State state) {
+	public MyProcess findByState(State state) {
 		for (MyProcess myProcess : processList) {
 			if(myProcess.getState().equals(state)) {
 				return myProcess;
@@ -198,45 +212,35 @@ public class Manager extends MyThread{
 		return null;
 	}
 
-	/**
-	 * imprime la lista de estados
-	 */
-	private void printStatusProcess() {
-		for (MyProcess process : processList) {
-			System.out.println("Name -> " + process.getName() + " State -> " + process.getState().toString()
-					+ " Duration -> " + process.getDuration());
-		}
-		System.out.println();
-	}
-
 	@Override
 	void executeTask() {
-		System.out.println("------------");
-		removeProcessTerminated(fildByState(State.TERMINATED));
+		removeProcessTerminated(findByState(State.TERMINATED));
 		changeStateCreateToQReady();
 
-		executing(fildByState(State.EXECUTING));
+		executing(findByState(State.EXECUTING));
 		changeStateReadytoExecuting();
 		putInReady();
 
-		moveProccesToQueueReady(fildByState(State.RECEIVING_I_O));
+		moveProccesToQueueReady(findByState(State.RECEIVING_I_O));
 
 		if (faceOrSeal()) {
-			changeWaitingIOtoReceivingIO(fildByState(State.WAITING_I_O));
+			changeWaitingIOtoReceivingIO(findByState(State.WAITING_I_O));
 			putQueueWaitingIO();
 		}
 
 		if (faceOrSeal()) {
-			moveProccesToQueueReady(fildByState(State.WAITING_CPU));
+			moveProccesToQueueReady(findByState(State.WAITING_CPU));
 			putQueueWaitingCPU();
 		}
 
-		printStatusProcess();
 		if(processList.size() == 0) {
 			stop();
 		}
 	}
-
+	/**
+	 * remueve los procesos de la cola que hayan terminado
+	 * @param process
+	 */
 	private void removeProcessTerminated(MyProcess process) {
 		if(process != null) {
 			processList.remove(process);
@@ -259,9 +263,7 @@ public class Manager extends MyThread{
 	private void putQueueWaitingCPU() {
 		try {
 			queueWaitingCPU.getToQueue().setState(State.WAITING_CPU);;
-		} catch (Exception e) {
-			System.out.println("line 221  cola CPU vacio");
-		}
+		} catch (Exception e) {}
 	}
 	/**
 	 * mueve el proceso del WAITING I/O hacia RECEIVING I/O
@@ -278,17 +280,15 @@ public class Manager extends MyThread{
 	private void putQueueWaitingIO() {
 		try {
 			queueWaitingIO.getToQueue().setState(State.WAITING_I_O);;
-		} catch (Exception e) {
-			System.out.println("line 221  cola I/0 vacio");
-		}
+		} catch (Exception e) {}
 	}
 
 	/**
 	 * cambia el estado del proceso que este en READY a EXECUTING
 	 */
 	private void changeStateReadytoExecuting() {
-		if(fildByState(State.READY)!= null) {
-			fildByState(State.READY).setState(State.EXECUTING);
+		if(findByState(State.READY)!= null) {
+			findByState(State.READY).setState(State.EXECUTING);
 			isReady = false;
 		}
 	}
@@ -331,7 +331,6 @@ public class Manager extends MyThread{
 		int number = 0;
 		for (int i = 0; i < 7; i++) {
 			number = random.ints(MIN_NUM, MAX_NUM).limit(LIMIT).findFirst().getAsInt();
-			System.out.println(number);
 			if (number == 0) {
 				countFace += 1;
 			}else {
@@ -340,6 +339,4 @@ public class Manager extends MyThread{
 		}
 		return countFace > countCross;
 	}
-
-
 }

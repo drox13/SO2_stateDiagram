@@ -7,7 +7,11 @@ import javax.swing.Timer;
 
 import models.Manager;
 import views.MainWindows;
-
+/**
+ * 
+ * @author Brayan Cardenas
+ *
+ */
 public class Presenter {
 	private Manager manager;
 	private MainWindows mainWindows;
@@ -15,23 +19,11 @@ public class Presenter {
 	public Presenter() {
 		manager = new Manager();
 		mainWindows = new MainWindows();
-		init();
+		init(mainWindows.getNumberProcess());
 	}
 	
-	public void init() {
-//		manager.addToList(Manager.createProcess(8));
-//		manager.addToList(Manager.createProcess(6));
-//		manager.addToList(Manager.createProcess(10));
-//		manager.addToList(Manager.createProcess(6));
-//		manager.addToList(Manager.createProcess(8));
-//		manager.addToList(Manager.createProcess(6));
-//		manager.addToList(Manager.createProcess(10));
-//		manager.addToList(Manager.createProcess(6));
-//		manager.addToList(Manager.createProcess(8));
-//		manager.addToList(Manager.createProcess(6));
-//		manager.addToList(Manager.createProcess(10));
-//		manager.addToList(Manager.createProcess(6));
-		for (int i = 0; i < 20; i++) {
+	public void init(int numberProcess) {
+		for (int i = 0; i < numberProcess; i++) {
 			manager.addToList(Manager.createProcess(manager.generateRandomNumberEven()));
 		}
 		
@@ -47,6 +39,5 @@ public class Presenter {
 			}
 		});
 		loop.start();
-		
 	}
 }

@@ -13,9 +13,15 @@ import javax.swing.JPanel;
 import models.MyProcess;
 import models.State;
 import structure.MyQueue;
-
+/**
+ * 
+ * @author Dario Baron, Brayan Cardernas
+ *
+ */
 public class CanvasDiagram  extends JPanel{
 
+	private static final String LABEL_QUEUE_READY = "Queue Ready";
+	private static final String NUMBER_OF_PROCESS = "# procesos: ";
 	private static final int SIZE_OVAL = 20;
 	private static final String RED_LIGHT = "#FF5733";
 	private static final String GREEN = "#3ADF00";
@@ -37,7 +43,7 @@ public class CanvasDiagram  extends JPanel{
 	private MyQueue<MyProcess> waitingCPU_GUI;
 	private MyQueue<MyProcess> waitingIO_GUI;
 	private CopyOnWriteArrayList<MyProcess> processListGUI;
-	
+
 	public CanvasDiagram() {
 		setBackground(Color.WHITE);
 		create = new MyRectangle((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth()/9,
@@ -74,7 +80,13 @@ public class CanvasDiagram  extends JPanel{
 		paintQueueIO(g2);
 		paintProccess(g2);
 	}
-	
+
+	/**
+	 * pinta los recuadros iniciales de los estados
+	 * @param g2
+	 * @param rectangle
+	 * @param state
+	 */
 
 	private void paintState(Graphics2D g2, MyRectangle rectangle, String state) {
 		g2.setColor(rectangle.getColorRectangle());
@@ -83,49 +95,57 @@ public class CanvasDiagram  extends JPanel{
 		g2.drawString(state, (int)(rectangle.getX() + rectangle.getWidth()/3),
 				(int) (rectangle.getY() + rectangle.getHeight() + 20));
 	}
-	
+
+	/**
+	 * Pinta las flechas de estado a estado
+	 * @param g2
+	 */
 	private void paintArrow(Graphics2D g2) {
 		g2.drawLine(create.x + MyRectangle.WIDTH_RECTANGLE_STATE, create.y, 
 				ready.x, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
 		g2.fillOval(ready.x - 13, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE, SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(ready.x + MyRectangle.WIDTH_RECTANGLE_STATE, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
 				executing.x, executing.y);
 		g2.fillOval(executing.x - 15, executing.y - 15, SIZE_OVAL, SIZE_OVAL);
 		g2.fillOval(ready.x + MyRectangle.WIDTH_RECTANGLE_STATE, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE - 10,
 				SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(executing.x + MyRectangle.WIDTH_RECTANGLE_STATE, executing.y,
 				waitingCpu.x + MyRectangle.WIDTH_RECTANGLE_STATE,
 				waitingCpu.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
 		g2.fillOval(waitingCpu.x + MyRectangle.WIDTH_RECTANGLE_STATE - 6,
 				waitingCpu.y + MyRectangle.HEIGTH_RECTANGLE_STATE, SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(executing.x + MyRectangle.WIDTH_RECTANGLE_STATE, executing.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
 				terminated.x, terminated.y);
 		g2.fillOval(terminated.x - 10, terminated.y - 10, SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(executing.x, executing.y + MyRectangle.HEIGTH_RECTANGLE_STATE,
 				waitingIO.x + (MyRectangle.WIDTH_RECTANGLE_STATE / 2), waitingIO.y);
 		g2.fillOval(waitingIO.x + (MyRectangle.WIDTH_RECTANGLE_STATE / 2) - 10, waitingIO.y - 15, SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(waitingIO.x, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2),
 				receivingIO.x + MyRectangle.WIDTH_RECTANGLE_STATE, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2));
 		g2.fillOval(receivingIO.x + MyRectangle.WIDTH_RECTANGLE_STATE, waitingIO.y + (MyRectangle.HEIGTH_RECTANGLE_STATE / 2) - 10, SIZE_OVAL, SIZE_OVAL);
-		
+
 		g2.drawLine(receivingIO.x, receivingIO.y,
 				ready.x, ready.y + MyRectangle.HEIGTH_RECTANGLE_STATE);
 	}
-	
+
+	/**
+	 * rellena los rectangulos con el proceso que llego al estado correspondiente
+	 * @param g2
+	 */
 	private void paintProccess(Graphics2D g2) {
-	if(processListGUI != null) {
+		if(processListGUI != null) {
 			for (MyProcess process : processListGUI) {
 				switch (State.valueOf(process.getState().toString())) {
 				case CREATE:
 					g2.setColor(create.getColorRectangle());
 					g2.fill(create);
 					g2.setColor(Color.WHITE);
-					g2.drawString("# procesos: " + processListGUI.size(), (int)(create.getX() + 30),
+					g2.drawString(NUMBER_OF_PROCESS + processListGUI.size(), (int)(create.getX() + 30),
 							(int) (create.getY() + create.getHeight()/2) + 10);
 					break;
 				case READY:
@@ -156,7 +176,12 @@ public class CanvasDiagram  extends JPanel{
 			}
 		}
 	}
-
+	/**
+	 * rellena los rectangulos con el proceso que llego al estado correspondiente
+	 * @param g2
+	 * @param rectangle
+	 * @param process
+	 */
 	private void fillRectangle(Graphics2D g2, MyRectangle rectangle, MyProcess process) {
 		rectangle.setColorRectangle(process.getColor());
 		g2.setColor(rectangle.getColorRectangle());
@@ -165,10 +190,13 @@ public class CanvasDiagram  extends JPanel{
 		g2.drawString(process.toString(), (int)(rectangle.getX() + 30),
 				(int) (rectangle.getY() + rectangle.getHeight()/2 + 10));
 	}
-	
+	/**
+	 * pinta la cola del READY
+	 * @param g2
+	 */
 	private void paintQueueReady(Graphics2D g2) {
 		int posY = 40;
-		g2.drawString("Queue Ready", 25, 20);
+		g2.drawString(LABEL_QUEUE_READY, 25, 20);
 		if(waitingReadyGUI != null) {
 			Iterator<MyProcess> iterator = waitingReadyGUI.iterator();
 			while (iterator.hasNext()) {
@@ -181,7 +209,10 @@ public class CanvasDiagram  extends JPanel{
 			}
 		}
 	}
-	
+	/**
+	 * pinta la cola del WAITING CPU
+	 * @param g2
+	 */
 	private void paintQueueCPU(Graphics2D g2) {
 		int posY = 10;
 		if(waitingCPU_GUI != null) {
@@ -196,7 +227,10 @@ public class CanvasDiagram  extends JPanel{
 			}
 		}
 	}
-	
+	/**
+	 * pinta la cola del WAITING I/O
+	 * @param g2
+	 */
 	private void paintQueueIO(Graphics2D g2) {
 		int posY = waitingIO.y;
 		if(waitingIO_GUI != null) {
@@ -211,22 +245,35 @@ public class CanvasDiagram  extends JPanel{
 			}
 		}
 	}
-	
+	/**
+	 * instancia la cola READY grafica
+	 * @param queueWaitingReady cola logica
+	 */
 	public void setWaitingReady(MyQueue<MyProcess> queueWaitingReady) {
 		waitingReadyGUI = queueWaitingReady;
 		repaint();
 	}
-	
+	/**
+	 * instancia cola CPU grafica
+	 * @param queueWaitingCPU cola CPU logica
+	 */
+
 	public void setWaitingCPU(MyQueue<MyProcess> queueWaitingCPU) {
 		waitingCPU_GUI = queueWaitingCPU;
 		repaint();
 	}
-	
+	/**
+	 * instancia cola I/O grafica 
+	 * @param queueWaitingIO cola logica
+	 */
 	public void setWaitingIO(MyQueue<MyProcess> queueWaitingIO) {
 		waitingIO_GUI = queueWaitingIO;
 		repaint();
 	}
-	
+	/**
+	 * instancia la cola de procesos grafica
+	 * @param listProcess cola logica
+	 */
 	public void updateProcessListGUI(CopyOnWriteArrayList<MyProcess>listProcess) {
 		processListGUI = listProcess;
 	}

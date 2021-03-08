@@ -5,12 +5,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import models.MyProcess;
 import structure.MyQueue;
-
+/**
+ * 
+ * @author Dario Baron, Brayan Cardernas
+ *
+ */
 public class MainWindows extends JFrame{
 
+	private static final String MESSAGE_SUGGESTION = "Se aconseja ingresar un numerO >10 para lograr ver las colas WAITING CPU y WAITING I/O";
+	private static final String MESSAGE_ERROR = "Ingrese un numero";
+	private static final String MESSAGE_NUMBER_OF_PROCESS = "Ingrese el numero de procesos";
 	private static final String PATH_ICON_SIMULATION = "/img/automation.png";
 	private static final String TITLE_APP = "Simulacion diagrama de 7 estados";
 	private static final long serialVersionUID = 1L;
@@ -41,5 +49,17 @@ public class MainWindows extends JFrame{
 	
 	public void updateProcessListGUI(CopyOnWriteArrayList<MyProcess> processList) {
 		canvasDiagram.updateProcessListGUI(processList);
+	}
+
+	public int getNumberProcess() {
+		int numberProces = 0;
+		try {
+			JOptionPane.showMessageDialog(null, MESSAGE_SUGGESTION);
+			 numberProces = Integer.parseInt(JOptionPane.showInputDialog(MESSAGE_NUMBER_OF_PROCESS));
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(null, MESSAGE_ERROR);
+			
+		}
+		return numberProces;
 	}
 }

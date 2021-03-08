@@ -1,5 +1,9 @@
 package models;
-
+/**
+ * 
+ * @author Brayan Cardenas
+ *
+ */
 public abstract class MyThread implements Runnable{
 
     private Thread thread;

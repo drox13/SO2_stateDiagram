@@ -33,7 +33,7 @@ public class MyQueue <T> implements Iterable<T>{
 	 * Verifica si la cola tiene elementos
 	 * @return verdadero si la cola esta sin elementos
 	 */
-	public boolean isEmtry() {
+	public boolean isEmpty() {
 		return head == null;
 	}
 

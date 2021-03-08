@@ -2,7 +2,11 @@ package models;
 
 import java.awt.Color;
 import java.util.Random;
-
+/**
+ * 
+ * @author Dario Baron, Brayan Cardernas
+ *
+ */
 public class MyProcess {
 	private static int count;
 	private int id;

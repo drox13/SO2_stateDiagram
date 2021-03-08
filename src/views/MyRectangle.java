@@ -2,7 +2,11 @@ package views;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-
+/**
+ * 
+ * @author Dario Baron, Brayan Cardernas
+ *
+ */
 public class MyRectangle extends Rectangle{
 	private static final long serialVersionUID = 1L;
 	private Color colorRectangle;
